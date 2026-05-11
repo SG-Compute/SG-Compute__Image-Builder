@@ -1,0 +1,9 @@
+# Runtime dependencies for sg_image_builder (sgi).
+# Authoritative source is pyproject.toml [project.dependencies]; this file
+# exists for installs in environments that prefer `pip install -r`.
+
+osbot-utils  >= 2.0.0
+osbot-aws    >= 1.0.0
+typer        >= 0.12
+rich         >= 13.7
+zstandard    >= 0.22

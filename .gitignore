@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# sgi-specific: workspaces live under _vaults/ and are intentionally not
+# committed to this repo (per library/dev_packs/.../librarian-brief.md and
+# principle P14). The folder itself is kept via _vaults/.gitkeep.
+_vaults/*
+!_vaults/.gitkeep
+
+# sgi build output (zipapp + staging)
+dist/

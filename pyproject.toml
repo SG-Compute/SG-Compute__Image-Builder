@@ -1,0 +1,119 @@
+[build-system]
+requires      = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name            = "sg-image-builder"
+dynamic         = ["version"]
+description     = "sgi - ephemeral EC2 image builder via capture/replay (the sg-compute image layer)"
+readme          = "README.md"
+requires-python = ">=3.11"
+license         = { file = "LICENSE" }
+authors         = [
+    { name = "SG-Compute", email = "noreply@sg-compute.example" },
+]
+keywords        = ["sgi", "sg-compute", "ec2", "image-builder", "bundle"]
+classifiers     = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Software Distribution",
+    "Topic :: System :: Systems Administration",
+]
+dependencies    = [
+    "osbot-utils  >= 2.0.0",
+    "osbot-aws    >= 1.0.0",
+    "typer        >= 0.12",
+    "rich         >= 13.7",
+    "zstandard    >= 0.22",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest        >= 8.0",
+    "pytest-cov    >= 5.0",
+    "pytest-xdist  >= 3.5",
+]
+dev  = [
+    "ruff          >= 0.5",
+    "mypy          >= 1.10",
+]
+
+[project.scripts]
+sgi              = "sg_image_builder.cli.app:app"
+sg-image-builder = "sg_image_builder.cli.app:app"
+
+[project.urls]
+Homepage   = "https://github.com/SG-Compute/SG-Compute__Image-Builder"
+Repository = "https://github.com/SG-Compute/SG-Compute__Image-Builder"
+Issues     = "https://github.com/SG-Compute/SG-Compute__Image-Builder/issues"
+
+[tool.setuptools.dynamic]
+# The `version` file holds the human/git-tag form ("v0.0.1"). Python
+# packaging requires PEP 440 (no leading "v"), so we expose
+# `sg_image_builder.__version__` which strips the leading "v" at import time.
+version = { attr = "sg_image_builder.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["sg_image_builder*"]
+exclude = ["sg_image_builder__tests*", "sg_image_builder_specs*", "_vaults*"]
+
+[tool.setuptools.package-data]
+sg_image_builder = ["version"]
+
+# ─── ruff ────────────────────────────────────────────────────────────────────
+[tool.ruff]
+target-version = "py311"
+line-length    = 120
+extend-exclude = ["_vaults", "dist", "build"]
+
+[tool.ruff.lint]
+# Conservative ruleset for v0.0.x. The pack's code conventions (Type_Safe,
+# no Pydantic, no boto3 direct, etc.) are enforced by code review rather
+# than lint rules.
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",   # line length — managed by ruff format
+    "E741",   # ambiguous names — Word__Word naming intentionally uses underscores
+]
+
+[tool.ruff.format]
+quote-style = "single"
+
+# ─── mypy ────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version          = "3.11"
+ignore_missing_imports  = true
+warn_unused_ignores     = true
+warn_redundant_casts    = true
+# Strictness is dialled up over time. Bootstrap is permissive.
+disallow_untyped_defs   = false
+check_untyped_defs      = true
+
+# ─── pytest ──────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths        = ["sg_image_builder__tests"]
+python_files     = ["test_*.py", "*_test.py"]
+python_classes   = ["Test_*", "test_*"]
+python_functions = ["test_*"]
+addopts          = "-ra --strict-markers"
+markers          = [
+    "gpu:         requires SGI_GPU_TESTS_ENABLED",
+    "long:        requires SGI_LONG_TESTS_ENABLED",
+    "s3:          requires SGI_S3_TESTS_ENABLED",
+    "e2e:         requires SGI_E2E_ENABLED",
+]
+
+# ─── coverage ────────────────────────────────────────────────────────────────
+[tool.coverage.run]
+source = ["sg_image_builder"]
+omit   = ["*/version*", "sg_image_builder/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

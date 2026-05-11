@@ -1,0 +1,82 @@
+name: PR
+
+on:
+  pull_request:
+    branches: [main, dev]
+
+concurrency:
+  group:               pr-${{ github.head_ref || github.run_id }}
+  cancel-in-progress:  true
+
+permissions:
+  contents:      read
+  pull-requests: read
+
+jobs:
+  lint-and-typecheck:
+    name:     Lint and typecheck
+    runs-on:  ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache:          'pip'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev,test]
+      - name: ruff check
+        run: ruff check sg_image_builder/ sg_image_builder__tests/
+      - name: ruff format --check
+        run: ruff format --check sg_image_builder/ sg_image_builder__tests/
+      - name: mypy
+        run: mypy sg_image_builder/
+
+  unit-tests:
+    name:     Unit tests
+    runs-on:  ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache:          'pip'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+      - name: pytest (unit)
+        run: |
+          pytest sg_image_builder__tests/unit/ -v \
+            --cov=sg_image_builder \
+            --cov-report=xml \
+            --cov-fail-under=90
+      - name: Upload coverage
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          token:  ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  integration-tests:
+    name:     Integration tests
+    runs-on:  ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache:          'pip'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+      - name: pytest (integration)
+        # Real SSH-host fixture lands in M1 alongside Exec_Provider__SSH.
+        # For M0 this gate runs the integration placeholder suite.
+        run: pytest sg_image_builder__tests/integration/ -v

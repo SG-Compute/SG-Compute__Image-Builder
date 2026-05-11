@@ -1,0 +1,10 @@
+# Test dependencies for sg_image_builder.
+# Authoritative source is pyproject.toml [project.optional-dependencies].test.
+
+-r requirements.txt
+
+pytest        >= 8.0
+pytest-cov    >= 5.0
+pytest-xdist  >= 3.5
+ruff          >= 0.5
+mypy          >= 1.10
