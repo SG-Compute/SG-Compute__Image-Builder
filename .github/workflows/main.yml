@@ -3,13 +3,31 @@ name: Main
 on:
   push:
     branches: [main, dev]
+    # Ignore paths that should NOT trigger CI / a new tag bump.
+    # `sg_image_builder/version` is excluded so the increment-tag step's
+    # version-bump commit does not re-trigger this workflow (it changes
+    # only that file). Other directories are docs / scaffolding that
+    # don't warrant a release.
+    paths-ignore:
+      - 'sg_image_builder/version'
+      - '**/*.md'
+      - 'team/**'
+      - 'humans/**'
+      - 'docs/**'
+      - 'library/**'
+      - '_vaults/**'
+      - '.github/**/*.md'
 
 concurrency:
   group:               main-${{ github.ref }}
   cancel-in-progress:  false
 
 permissions:
-  contents: write          # auto-tag needs to push tags
+  contents: write          # auto-tag pushes the version-bump commit + tag
+
+env:
+  PACKAGE_NAME: 'sg_image_builder'
+  GIT__BRANCH:  ${{ github.ref_name }}
 
 jobs:
   lint-and-typecheck:
@@ -87,28 +105,54 @@ jobs:
           path:          dist/sgi.zipapp
           retention-days: 30
 
-  auto-tag:
-    name:     Auto-tag on main
+  increment-tag:
+    name:     Increment tag
     runs-on:  ubuntu-latest
-    needs:    [build-zipapp]
-    if:       github.ref == 'refs/heads/main'
+    needs:    [lint-and-typecheck, unit-tests, integration-tests, build-zipapp]
+    if:       ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
     steps:
-      - uses: actions/checkout@v4
+      # Seed an initial v* tag so the osbot-sbot increment-tag action's
+      # `git describe --tags` call has something to find on first run.
+      # Idempotent: skipped on subsequent runs once any v* tag exists.
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token:       ${{ secrets.GITHUB_TOKEN }}
-      - name: Read version file
-        id:   version
-        run:  echo "version=$(cat sg_image_builder/version)" >> "$GITHUB_OUTPUT"
-      - name: Create tag if it does not already exist
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
+
+      - name: Seed baseline tag if none exists
         run: |
-          if ! git rev-parse "$VERSION" >/dev/null 2>&1; then
+          git fetch --tags
+          if [ -z "$(git tag --list 'v*')" ]; then
+            VERSION=$(cat sg_image_builder/version)
+            echo "no v* tags found - seeding baseline $VERSION"
             git config user.name  'github-actions[bot]'
             git config user.email 'github-actions[bot]@users.noreply.github.com'
             git tag "$VERSION"
             git push origin "$VERSION"
           else
-            echo "tag $VERSION already exists - skipping"
+            echo "v* tags already present - no seed needed"
           fi
+
+      # The osbot-sbot action's `release_type` labels are inverted vs the
+      # semver intuition the user sees - read its action.yml if in doubt:
+      #
+      #   release_type=minor  ->  bumps PATCH  (v0.0.1 -> v0.0.2)
+      #   release_type=major  ->  bumps MINOR  (v0.0.1 -> v0.1.0)
+      #
+      # We want patch on dev and minor on main, so the mapping is:
+      #   dev   -> release_type=minor
+      #   main  -> release_type=major
+      - name: Determine release_type
+        id:   release_type
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "type=major" >> "$GITHUB_OUTPUT"
+          else
+            echo "type=minor" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Increment tag
+        uses: owasp-sbot/OSBot-GitHub-Actions/.github/actions/git__increment-tag@dev
+        with:
+          release_type: ${{ steps.release_type.outputs.type }}

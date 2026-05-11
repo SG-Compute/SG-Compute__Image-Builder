@@ -14,7 +14,7 @@ than 90 days into `archive/<MM>/`._
 | Conductor   | _(none yet)_ |
 | Architect   | _(none yet)_ |
 | Developer   | [v0.0.1 M0 bootstrap plan](../developer/reviews/05/11/v0.0.1__implementation-plan__m0-bootstrap.md) — 11 May 2026 |
-| DevOps      | [v0.0.1 CI pipeline bootstrap](../devops/reviews/05/11/v0.0.1__ci-pipeline-bootstrap.md) — 11 May 2026 |
+| DevOps      | [v0.0.1 auto-tag on merge](../devops/reviews/05/11/v0.0.1__auto-tag-on-merge.md) — 11 May 2026 (supersedes parts of `v0.0.1__ci-pipeline-bootstrap.md`) |
 | AppSec      | _(none yet — engages from M5)_ |
 | Librarian   | [v0.0.1 master-index bootstrap](reviews/05/11/v0.0.1__master-index__bootstrap.md) — 11 May 2026 |
 
