@@ -17,6 +17,7 @@ suite. The test suite is the contract (principle P16).
 | 7 | `ollama_docker`   | c5.xlarge    | M9                 | Same in a container |
 | 8 | `vllm_disk`       | g5.xlarge    | M10                | vLLM serving with the working flag set |
 | 9 | `vllm_docker`     | g5.xlarge    | M10                | Current local-claude path, just fast |
+| L1 | `ollama_mac_container` | Mac M-series (local) | M9 (local dev) | Container calls host Ollama via host-gateway; `curl` from inside container returns tags + completion |
 
 ## Per-spec layout (target shape, per dev pack §08)
 
