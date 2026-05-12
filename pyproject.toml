@@ -65,7 +65,7 @@ sg_image_builder = ["version"]
 
 # ─── ruff ────────────────────────────────────────────────────────────────────
 [tool.ruff]
-target-version = "py311"
+target-version = "v0.1.1"
 line-length    = 120
 extend-exclude = ["_vaults", "dist", "build"]
 
@@ -84,7 +84,7 @@ quote-style = "single"
 
 # ─── mypy ────────────────────────────────────────────────────────────────────
 [tool.mypy]
-python_version          = "3.11"
+python_version          = "v0.1.1"
 ignore_missing_imports  = true
 warn_unused_ignores     = true
 warn_redundant_casts    = true
