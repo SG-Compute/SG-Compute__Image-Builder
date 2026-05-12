@@ -48,6 +48,14 @@ periodically and prioritised by impact.
 
 ### Medium priority
 
+#### `v0.2.8__sgi-spike-results.md` is missing from the sister repo
+
+- **Why:** The HANDOVER (`library/dev_packs/v0.2.8__sg-image-builder/HANDOVER.md` in the sister repo) gates **M1+** on the spike's decision-gate (`strong pass` / `conditional pass` / `fail`). The results brief is supposed to land at `team/comms/briefs/v0.2.8__sgi-spike-results.md` in the sister repo.
+- **Status as of 12 May 2026:** the spike brief itself still reads `Status: PROPOSED - ready to start` and no `sgi-spike-results.md` exists on the branch I have read access to (`claude/review-project-debrief-dN7dO`).
+- **Decision taken:** Dinis chose to proceed with M1 PR2 anyway (option 3 of the three unblock paths: scratch-build against the pack's interface contract, accept the design-validation risk shifting to M10).
+- **What needs to happen eventually:** run the spike per `v0.2.8__sgi-local-claude-validation-spike.md`, publish the results brief, then retro-validate the calibrated types + exec flow in this repo against what the spike actually used. If results land in the `≤ 240 s` range, the PR2 design holds. If they don't, M1 work needs revision before more code lands.
+- **Tracked at:** `team/roles/developer/reviews/05/12/v0.0.1__m1-pr2__exec-providers.md` §"HANDOVER deviation"
+
 #### Dev pack §10 over-prescribes custom `Safe_Str__*` subclasses
 
 - **Why:** The pack's instinct (and the original brief) is to spawn a
