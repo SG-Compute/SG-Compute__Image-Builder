@@ -13,7 +13,7 @@ than 90 days into `archive/<MM>/`._
 |-------------|---------------|
 | Conductor   | _(none yet)_ |
 | Architect   | _(none yet)_ |
-| Developer   | [v0.0.1 Type_Safe usage calibration](../developer/reviews/05/11/v0.0.1__type-safe-usage-calibration.md) — 11 May 2026 (latest); [v0.0.1 M0 bootstrap plan](../developer/reviews/05/11/v0.0.1__implementation-plan__m0-bootstrap.md) |
+| Developer   | [v0.0.1 M1 PR1: types + first schemas](../developer/reviews/05/12/v0.0.1__m1-pr1__types-and-schemas.md) — 12 May 2026 (latest); [v0.0.1 Type_Safe usage calibration](../developer/reviews/05/11/v0.0.1__type-safe-usage-calibration.md) (+ 12 May addendum); [v0.0.1 M0 bootstrap plan](../developer/reviews/05/11/v0.0.1__implementation-plan__m0-bootstrap.md) |
 | DevOps      | [v0.0.1 auto-tag on merge](../devops/reviews/05/11/v0.0.1__auto-tag-on-merge.md) — 11 May 2026 (supersedes parts of `v0.0.1__ci-pipeline-bootstrap.md`) |
 | AppSec      | _(none yet — engages from M5)_ |
 | Librarian   | [v0.0.1 master-index bootstrap](reviews/05/11/v0.0.1__master-index__bootstrap.md) — 11 May 2026 |
